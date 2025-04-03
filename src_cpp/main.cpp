@@ -29,6 +29,7 @@ int read_points_from_csv(string file_path, vector<vector<double>> &points)
         if (line[i] == ',')
             num_columns += 1;
     }
+    num_columns += 1;
 
     // Create all necessary columns 
     for (int i = 0; i < num_columns; i++)
@@ -37,7 +38,6 @@ int read_points_from_csv(string file_path, vector<vector<double>> &points)
     }
 
     // Add all points to the vector
-    cout << "Got to this pint" << endl;
     while (getline(file, line))
     {
         char buffer[1024];
@@ -125,11 +125,5 @@ int main()
     // Get points from the file
     vector<vector<double>> points = vector<vector<double>>();
     read_points_from_csv(path, points);
-
-    int a = 10;
-    int b = 10;
-
-
-
     return 0;
 }
