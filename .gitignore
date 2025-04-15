@@ -2,3 +2,4 @@ chromedriver-mac-arm64/
 .venv/
 datasets/
 pdal_jsons/
+archive/
