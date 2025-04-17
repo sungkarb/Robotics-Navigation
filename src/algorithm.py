@@ -72,39 +72,31 @@ class PathSolver:
         z = (z - self.zmean) / self.zstd
         return (x, y, z)
     
-    def tsp_bruteforce(self, points: list[tuple[float, float]], start: int = 0) -> tuple[list, float]:
+    def tsp_bruteforce(self, points: list[tuple[float]], start: tuple[float]) -> tuple[list[tuple[float]], float]:
         """
         Finds the best path between a given set of points using bruteforce.
         
         Args:
             points - list of points to be visited in GPS coordinates
-            start - starting point
+            start - starting point (should be distinct from the rest of the points)
         Returns:
-            list of points in the order they should be visited
-            float - distance of the path
+            list of points in the order they should be visited, including the start point
+            total distance of the path
         """
-        tsp_start = time.time()
-        n = len(points)
-        dist_matrix = np.array([[util.dist_gps(points[i] - points[j]) for j in range(n)] for i in range(n)])
-        
-        cities = np.arange(n)
-        cities = np.delete(cities, start)
+        points = [start] + points
+        best_path = None
+        min_dist = float('inf')
 
-        min_distance = np.inf
-        best_route = None
+        for perm in permutations(points[1:]):
+            current_path = [start] + list(perm)
+            current_dist = sum(util.dist_gps(current_path[i], current_path[i + 1]) for i in range(len(current_path) - 1))
+            if current_dist < min_dist:
+                min_dist = current_dist
+                best_path = current_path
 
-        for perm in permutations(cities):
-            route = np.concatenate(([start], perm))
-            distance = np.sum([dist_matrix[route[i], route[i+1]] for i in range(len(route)-1)])
+        return best_path, min_dist
 
-            if distance < min_distance:
-                min_distance = distance
-                best_route = route
-        tsp_end = time.time()
-        print(f"Bruteforce TSP took {round(tsp_end - tsp_start, 3)} seconds")
-        return best_route, min_distance
-
-    def find_path(self, start: tuple[float], end: tuple[float], alpha=10000, numpoints=5) -> list[tuple[float]]:
+    def find_path(self, start: tuple[float], end: tuple[float], alpha=10000, numpoints=5) -> list[tuple[float, float]]:
         """
         Finds the best path between start and end which are represented as tuple (x, y) using
         A* algorithm.
@@ -116,7 +108,7 @@ class PathSolver:
                     computation
             numpoints - number of points to be returned along the path
         Returns:
-            list of points starting from the start to end node
+            list of points starting from the start to end node in GPS coordinates
         """
         start = start[:2]
         end = end[:2]
