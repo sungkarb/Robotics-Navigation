@@ -45,17 +45,25 @@ python -m venv venv
 source venv/bin/activate  # or venv\Scripts\activate on Windows
 ```
 
-#### 3. Install dependencies
+#### 3. Run setup code
 ```bash
-pip install -r requirements.txt
+sh setup.sh
 ```
 
-#### 4. Run the algorithm
+#### 4. Install chromedriver
+Open the following link in your browser:
+```
+https://storage.googleapis.com/chrome-for-testing-public/135.0.7049.95/win64/chromedriver-win64.zip
+```
+Open the link corresponding to your OS. (This should be chromedriver mac-arm64 or win64)
+**MAKE SURE YOU DOWNLOAD A `chromedriver`**
+
+#### 5. Run the algorithm
 ```bash
 python algorithm.py
 ```
 
-#### 5. Visualize results
+#### 6. Visualize results
 ```bash
 python visualize.py
 ```
