@@ -96,7 +96,7 @@ class PathSolver:
 
         return best_path, min_dist
 
-    def find_path(self, start: tuple[float], end: tuple[float], alpha=10000, numpoints=5) -> list[tuple[float, float]]:
+    def find_path(self, start: tuple[float], end: tuple[float], alpha=10000, numpoints=5) -> list[tuple[float]]:
         """
         Finds the best path between start and end which are represented as tuple (x, y) using
         A* algorithm.
@@ -139,7 +139,8 @@ class PathSolver:
         return short_list
 
 def main():
-    solver = PathSolver("../datasets/camel_ridge_5.csv")
+    data_path = os.path.join(os.path.dirname(__file__), "../datasets/camel_ridge_5.csv")
+    solver = PathSolver(data_path)
     pathpoints = solver.find_path([38.395879, -110.779201],[38.398112, -110.783233])
     print(pathpoints)
 
