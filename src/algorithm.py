@@ -6,6 +6,9 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from scipy.spatial import KDTree
 
+from itertools import permutations
+import utilities as util
+
 class PathSolver:
     def _init_helper(self):
         """
@@ -60,7 +63,7 @@ class PathSolver:
 
         Args:
             point - list of three coordinates (x, y, z)
-        Returns
+        Returns:
             transformed list of points with zero mean and unit variance
         """
         x, y, z = point
@@ -68,6 +71,38 @@ class PathSolver:
         y = (y - self.ymean) / self.ystd
         z = (z - self.zmean) / self.zstd
         return (x, y, z)
+    
+    def tsp_bruteforce(self, points: list[tuple[float, float]], start: int = 0) -> tuple[list, float]:
+        """
+        Finds the best path between a given set of points using bruteforce.
+        
+        Args:
+            points - list of points to be visited in GPS coordinates
+            start - starting point
+        Returns:
+            list of points in the order they should be visited
+            float - distance of the path
+        """
+        tsp_start = time.time()
+        n = len(points)
+        dist_matrix = np.array([[util.dist_gps(points[i] - points[j]) for j in range(n)] for i in range(n)])
+        
+        cities = np.arange(n)
+        cities = np.delete(cities, start)
+
+        min_distance = np.inf
+        best_route = None
+
+        for perm in permutations(cities):
+            route = np.concatenate(([start], perm))
+            distance = np.sum([dist_matrix[route[i], route[i+1]] for i in range(len(route)-1)])
+
+            if distance < min_distance:
+                min_distance = distance
+                best_route = route
+        tsp_end = time.time()
+        print(f"Bruteforce TSP took {round(tsp_end - tsp_start, 3)} seconds")
+        return best_route, min_distance
 
     def find_path(self, start: tuple[float], end: tuple[float], alpha=10000, numpoints=5) -> list[tuple[float]]:
         """
