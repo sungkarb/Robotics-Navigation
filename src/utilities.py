@@ -1,8 +1,12 @@
-import geopy.distance.distance
+from geopy import distance
 
 class utilites:
+    """
+    A class containing utility functions for point cloud processing and distance calculations.
+    """
+
     @staticmethod
-    def dist_gps(point_1: tuple[float, float], point_2: tuple[float, float]) -> float:
+    def dist_gps(point_1: tuple[float], point_2: tuple[float]) -> float:
         """
         Calculate the distance between two points in GPS coordinates using the geopy library.
 
@@ -13,4 +17,4 @@ class utilites:
         Returns:
             Distance in meters between the two points.
         """
-        return geopy.distance.distance(point_1, point_2).m
+        return distance.distance(point_1[:2], point_2[:2]).m
