@@ -72,7 +72,8 @@ class PathSolver:
         z = (z - self.zmean) / self.zstd
         return (x, y, z)
     
-    def tsp_bruteforce(self, points: list[tuple[float]], start: tuple[float]) -> tuple[list[tuple[float]], float]:
+    @staticmethod
+    def tsp_bruteforce(start: tuple[float], points: list[tuple[float]]) -> tuple[list[tuple[float]], float]:
         """
         Finds the best path between a given set of points using bruteforce.
         
@@ -98,7 +99,7 @@ class PathSolver:
 
     def find_path(self, start: tuple[float], end: tuple[float], alpha=10000, numpoints=5) -> list[tuple[float]]:
         """
-        Finds the best path between start and end which are represented as tuple (x, y) using
+        Finds the best path between start and end which are represented as tuple (x, y, ...) using
         A* algorithm.
 
         Args:
@@ -108,7 +109,7 @@ class PathSolver:
                     computation
             numpoints - number of points to be returned along the path
         Returns:
-            list of points starting from the start to end node in GPS coordinates
+            list of points starting from the start to end node in GPS coordinates (including the start point)
         """
         start = start[:2]
         end = end[:2]
@@ -137,12 +138,34 @@ class PathSolver:
         n = len(result)
         short_list = [result[i] for i in range(0, n, int(n / numpoints))]
         return short_list
+    
+    def find_full_path(self, start: tuple[float], targets: list[tuple[float]], alpha=10000, numpoints=5) -> list[tuple[float]]:
+        """
+        Finds the best open path from a given start point that visits all points in the list targets.
+
+        Args:
+            start - start point
+            targets - list of target points to be visited
+            alpha - hyperparameter controlling the degree to which change in elevation affects the path
+                    computation
+            numpoints - number of points to be returned along each edge of the path
+        Returns:
+            list of points starting from the start to end node in GPS coordinates
+        """
+        start = start[:2]
+        targets = [target[:2] for target in targets]
+        ordered_targets, _ = PathSolver.tsp_bruteforce(start, targets)
+        path = []
+        for i in range(len(ordered_targets) - 1):
+            path += self.find_path(ordered_targets[i], ordered_targets[i + 1], alpha, numpoints)
+        return path
 
 def main():
-    data_path = os.path.join(os.path.dirname(__file__), "../datasets/camel_ridge_5.csv")
+    data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "datasets", "camel_ridge_5.csv"))
     solver = PathSolver(data_path)
-    pathpoints = solver.find_path([38.395879, -110.779201],[38.398112, -110.783233])
-    print(pathpoints)
+    # pathpoints = solver.find_path([38.395879, -110.779201],[38.398112, -110.783233])
+    path_points = solver.find_full_path([38.395879, -110.779201], [[38.398112, -110.783233], [38.396112, -110.783233], [38.397112, -110.783233]])
+    print(path_points)
 
 if __name__ == "__main__":
     main()
