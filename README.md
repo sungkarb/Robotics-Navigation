@@ -57,6 +57,7 @@ https://storage.googleapis.com/chrome-for-testing-public/135.0.7049.95/win64/chr
 ```
 Open the link corresponding to your OS. (This should be chromedriver mac-arm64 or win64)
 **MAKE SURE YOU DOWNLOAD A `chromedriver`**
+Then, unzip the file and move the file named `chromedriver` into the `/browser/` directory.
 
 #### 5. Run the algorithm
 ```bash
