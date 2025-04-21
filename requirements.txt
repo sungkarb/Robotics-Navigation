@@ -5,3 +5,4 @@ selenium
 scipy
 rustworkx
 geopy
+laspy
