@@ -97,7 +97,7 @@ class PathSolver:
 
         return best_path, min_dist
 
-    def find_path(self, start: tuple[float], end: tuple[float], alpha=10000, numpoints=5) -> list[tuple[float]]:
+    def find_path(self, start: tuple[float], end: tuple[float], alpha=10000, numpoints=5, allpoints=False) -> list[tuple[float]]:
         """
         Finds the best path between start and end which are represented as tuple (x, y, ...) using
         A* algorithm.
@@ -136,10 +136,15 @@ class PathSolver:
         result_indx = rx.astar_shortest_path(self.G, graph_indx, goal_fn=goal_fn, edge_cost_fn=edge_fn, estimate_cost_fn=estimate_fn)
         result = [self.G[i] for i in result_indx]
         n = len(result)
+        if (allpoints == True):
+            return result
+        
         short_list = [result[i] for i in range(0, n, int(n / numpoints))]
         return short_list
+        
+        
     
-    def find_full_path(self, start: tuple[float], targets: list[tuple[float]], alpha=10000, numpoints=5) -> list[tuple[float]]:
+    def find_full_path(self, start: tuple[float], targets: list[tuple[float]], alpha=10000, numpoints=5, allpoints=False, save=False) -> list[tuple[float]]:
         """
         Finds the best open path from a given start point that visits all points in the list targets.
 
@@ -157,14 +162,19 @@ class PathSolver:
         ordered_targets, _ = PathSolver.tsp_bruteforce(start, targets)
         path = []
         for i in range(len(ordered_targets) - 1):
-            path += self.find_path(ordered_targets[i], ordered_targets[i + 1], alpha, numpoints)
+            path += self.find_path(ordered_targets[i], ordered_targets[i + 1], alpha, numpoints, allpoints)
+
+        if (save == True):
+            path_csv = pd.DataFrame(np.array(path), columns=["lon", "lat", "alt"])
+            path_csv.to_csv("path.csv", index=False)
+
         return path
 
 def main():
     data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "datasets", "camel_ridge_5.csv"))
     solver = PathSolver(data_path)
     # pathpoints = solver.find_path([38.395879, -110.779201],[38.398112, -110.783233])
-    path_points = solver.find_full_path([38.395879, -110.779201], [[38.398112, -110.783233], [38.396112, -110.783233], [38.397112, -110.783233]])
+    path_points = solver.find_full_path((38.395879, -110.779201), [(38.398112, -110.783233), (38.396112, -110.783233), (38.397112, -110.783233)])
     print(path_points)
 
 if __name__ == "__main__":
